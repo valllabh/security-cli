@@ -6,7 +6,11 @@ go build -o ./dist/security-cli
 
 ## run commands
 
-./dist/security-cli args
+./dist/app args
+
+scan repo
+
+./dist/app.exe scm scan https://github.com/laverdet/isolated-vm/tree/v4.3.3
 
 
 ## Prerequisits

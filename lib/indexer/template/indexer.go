@@ -1,7 +1,7 @@
 package changehere
 
 import (
-	"valllabh/security-cli/lib/indexer"
+	"github.com/valllabh/security-cli/lib/indexer"
 
 	"github.com/anchore/syft/syft/pkg"
 )

@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"valllabh/security-cli/lib/indexer"
+	"github.com/valllabh/security-cli/lib/indexer"
 
 	"github.com/anchore/syft/syft/pkg"
 )

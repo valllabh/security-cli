@@ -6,11 +6,12 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"valllabh/security-cli/lib/indexer"
-	"valllabh/security-cli/lib/indexer/cargo"
-	"valllabh/security-cli/lib/indexer/golang"
-	"valllabh/security-cli/lib/indexer/maven"
-	"valllabh/security-cli/lib/indexer/npm"
+
+	"github.com/valllabh/security-cli/lib/indexer"
+	"github.com/valllabh/security-cli/lib/indexer/cargo"
+	"github.com/valllabh/security-cli/lib/indexer/golang"
+	"github.com/valllabh/security-cli/lib/indexer/maven"
+	"github.com/valllabh/security-cli/lib/indexer/npm"
 
 	"github.com/anchore/syft/syft/pkg"
 	"github.com/spf13/cobra"
