@@ -2,7 +2,14 @@ module github.com/valllabh/security-cli
 
 go 1.19
 
+<<<<<<< HEAD
 require github.com/anchore/syft v0.66.1
+=======
+require (
+	github.com/anchore/syft v0.66.1
+	github.com/spf13/cobra v1.6.1
+)
+>>>>>>> 56740be0aff34461046f1cb07ddb6bb4f84f13e9
 
 require (
 	github.com/CycloneDX/cyclonedx-go v0.7.1-0.20221222100750-41a1ac565cce // indirect
@@ -94,7 +101,10 @@ require (
 	github.com/scylladb/go-set v1.0.3-0.20200225121959-cc7b2070d91e // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
+<<<<<<< HEAD
 	github.com/spf13/cobra v1.6.1
+=======
+>>>>>>> 56740be0aff34461046f1cb07ddb6bb4f84f13e9
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/sylabs/sif/v2 v2.8.1 // indirect
 	github.com/sylabs/squashfs v0.6.1 // indirect
