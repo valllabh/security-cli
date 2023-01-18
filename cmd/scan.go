@@ -55,8 +55,6 @@ var scanCmd = &cobra.Command{
 
 func Scan(remote string) {
 
-	local, _ := ioutil.TempDir("", "go-vcs")
-
 	cfg := ProviderConfig{
 		SyftProviderConfig: SyftProviderConfig{
 			CatalogingOptions: cataloger.DefaultConfig(),
@@ -64,11 +62,21 @@ func Scan(remote string) {
 	}
 	_, sbom, err := syftProvider(remote, cfg)
 
-	pacakges := sbom.Artifacts.PackageCatalog.Sorted()
-
-	for _, p := range pacakges {
-		fmt.Println(p.Name, p.Type)
+	if err != nil {
+		fmt.Println(err)
 	}
+
+	packages := sbom.Artifacts.PackageCatalog.Sorted()
+
+	for _, p := range packages {
+		fmt.Println(p.Name, p.Type, p.Version, p.Type, p.Language)
+	}
+
+	// convertToSPDXJson(sbom)
+}
+
+func convertToSPDXJson(sbom *sbom.SBOM) {
+	local, _ := ioutil.TempDir("", "go-vcs")
 
 	bytes, err := syft.Encode(*sbom, syft.FormatByName("spdx-2-json"))
 	if err != nil {
@@ -90,7 +98,6 @@ func Scan(remote string) {
 	}
 
 	fmt.Println(local + "/spdx.json" + " done")
-
 }
 
 func syftProvider(userInput string, config ProviderConfig) (Context, *sbom.SBOM, error) {
