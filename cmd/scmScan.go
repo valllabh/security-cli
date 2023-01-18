@@ -10,12 +10,38 @@ import (
 
 	"github.com/anchore/stereoscope/pkg/image"
 	"github.com/anchore/syft/syft"
+	"github.com/anchore/syft/syft/linux"
 	"github.com/anchore/syft/syft/pkg/cataloger"
 
 	"github.com/anchore/syft/syft/sbom"
 	"github.com/anchore/syft/syft/source"
 	"github.com/spf13/cobra"
 )
+
+type ProviderConfig struct {
+	SyftProviderConfig
+	SynthesisConfig
+}
+
+type Context struct {
+	Source *source.Metadata
+	Distro *linux.Release
+}
+
+type SyftProviderConfig struct {
+	CatalogingOptions             cataloger.Config
+	RegistryOptions               *image.RegistryOptions
+	Platform                      string
+	Exclusions                    []string
+	AttestationPublicKey          string
+	AttestationIgnoreVerification bool
+}
+
+type SynthesisConfig struct {
+	GenerateMissingCPEs bool
+}
+
+var errDoesNotProvide = fmt.Errorf("cannot provide packages from the given source")
 
 // scanCmd represents the scan command
 var scanCmd = &cobra.Command{
@@ -24,38 +50,27 @@ var scanCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		Scan(args[0])
 	},
-	Args: cobra.ExactArgs(2),
+	Args: cobra.ExactArgs(1),
 }
 
 func Scan(remote string) {
 
 	local, _ := ioutil.TempDir("", "go-vcs")
 
-	img := &image.Image{}
-
-	src, err := source.NewFromImage(img, remote)
-
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	config := cataloger.DefaultConfig()
-
-	catalog, _, distro, err := syft.CatalogPackages(&src, config)
-
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	s := sbom.SBOM{
-		Artifacts: sbom.Artifacts{
-			PackageCatalog:    catalog,
-			LinuxDistribution: distro,
+	cfg := ProviderConfig{
+		SyftProviderConfig: SyftProviderConfig{
+			CatalogingOptions: cataloger.DefaultConfig(),
 		},
-		Source: src.Metadata,
+	}
+	_, sbom, err := syftProvider(remote, cfg)
+
+	pacakges := sbom.Artifacts.PackageCatalog.Sorted()
+
+	for _, p := range pacakges {
+		fmt.Println(p.Name, p.Type)
 	}
 
-	bytes, err := syft.Encode(s, syft.FormatByName("spdx-2-json"))
+	bytes, err := syft.Encode(*sbom, syft.FormatByName("spdx-2-json"))
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -75,10 +90,47 @@ func Scan(remote string) {
 	}
 
 	fmt.Println(local + "/spdx.json" + " done")
+
+}
+
+func syftProvider(userInput string, config ProviderConfig) (Context, *sbom.SBOM, error) {
+	if config.CatalogingOptions.Search.Scope == "" {
+		return Context{}, nil, errDoesNotProvide
+	}
+
+	sourceInput, err := source.ParseInput(userInput, config.Platform, true)
+	if err != nil {
+		return Context{}, nil, err
+	}
+
+	src, cleanup, err := source.New(*sourceInput, config.RegistryOptions, config.Exclusions)
+	if err != nil {
+		return Context{}, nil, err
+	}
+	defer cleanup()
+
+	catalog, relationships, theDistro, err := syft.CatalogPackages(src, config.CatalogingOptions)
+	if err != nil {
+		return Context{}, nil, err
+	}
+	context := Context{
+		Source: &src.Metadata,
+		Distro: theDistro,
+	}
+
+	sbom := &sbom.SBOM{
+		Source:        src.Metadata,
+		Relationships: relationships,
+		Artifacts: sbom.Artifacts{
+			PackageCatalog: catalog,
+		},
+	}
+
+	return context, sbom, nil
 }
 
 func init() {
-	scmCmd.AddCommand(scanCmd)
+	rootCmd.AddCommand(scanCmd)
 
 	// Here you will define your flags and configuration settings.
 

@@ -1,9 +1,13 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 */
-package cmd
+package test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/valllabh/security-cli/cmd"
+)
 
 func TestScan(t *testing.T) {
 	tests := []struct {
@@ -16,7 +20,7 @@ func TestScan(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Scan(tt.remote)
+			cmd.Scan(tt.remote)
 		})
 	}
 }
