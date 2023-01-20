@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/json"
-	"log"
 
 	"github.com/dgraph-io/dgo"
+	"github.com/valllabh/security-cli/lib/ui"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
@@ -39,6 +39,7 @@ func getConnection() (*grpc.ClientConn, error) {
 	// host := urlParts[0] + ".grpc." + urlParts[1] + ":" + slashPort
 	pool, err := x509.SystemCertPool()
 	if err != nil {
+		ui.Fatal(err)
 		return nil, err
 	}
 
@@ -55,7 +56,7 @@ func NewClient() *dgo.Dgraph {
 	conn, err := getConnection()
 
 	if err != nil {
-		log.Fatal(err)
+		ui.Fatal(err)
 		return nil
 	}
 
@@ -68,8 +69,9 @@ func Store(obj any) (*api.Assigned, error) {
 	txn := graphAPI.NewTxn()
 
 	pb, err := json.Marshal(obj)
+
 	if err != nil {
-		log.Fatal(err)
+		ui.Fatal(err)
 		return nil, err
 	}
 
@@ -80,7 +82,7 @@ func Store(obj any) (*api.Assigned, error) {
 	res, err := txn.Mutate(context.Background(), mu)
 
 	if err != nil {
-		log.Fatal(err)
+		ui.Fatal(err)
 		return nil, err
 	}
 

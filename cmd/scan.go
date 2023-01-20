@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/valllabh/security-cli/lib/cataloger"
+	"github.com/valllabh/security-cli/lib/graph"
 	"github.com/valllabh/security-cli/lib/ui"
 
 	"github.com/spf13/cobra"
@@ -27,20 +28,21 @@ func Scan(userInput string) {
 	_, bom, err := cataloger.Catalog(userInput)
 
 	if err != nil {
-		fmt.Println(err)
+		ui.Fatal(err)
+		return
 	}
 
 	packages := bom.Artifacts.PackageCatalog.Sorted()
 
 	for _, p := range packages {
-		
-		ui.Step("Found " + p.Name + ":" + p.Version)
-		// res, err := graph.Store(p)
-		// if err != nil {
-		// 	fmt.Println(err)
-		// }
 
-		// fmt.Println(res)
+		ui.Step("Found " + p.Name + ":" + p.Version)
+		res, err := graph.Store(p)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		fmt.Println(res)
 	}
 
 }
