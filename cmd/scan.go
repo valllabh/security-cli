@@ -4,14 +4,17 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
+	"log"
 
 	"github.com/anchore/stereoscope/pkg/image"
 	"github.com/anchore/syft/syft"
 	"github.com/anchore/syft/syft/linux"
+	"github.com/anchore/syft/syft/pkg"
 	"github.com/anchore/syft/syft/pkg/cataloger"
+	"github.com/dgraph-io/dgo/protos/api"
+	"github.com/valllabh/security-cli/lib/graph"
 
 	"github.com/anchore/syft/syft/sbom"
 	"github.com/anchore/syft/syft/source"
@@ -60,44 +63,38 @@ func Scan(remote string) {
 			CatalogingOptions: cataloger.DefaultConfig(),
 		},
 	}
-	_, sbom, err := syftProvider(remote, cfg)
+	_, bom, err := syftProvider(remote, cfg)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	packages := sbom.Artifacts.PackageCatalog.Sorted()
+	packages := bom.Artifacts.PackageCatalog.Sorted()
 
 	for _, p := range packages {
 		fmt.Println(p.Name, p.Type, p.Version, p.Type, p.Language)
 	}
 
-	// convertToSPDXJson(sbom)
 }
 
-func convertToSPDXJson(sbom *sbom.SBOM) {
-	local, _ := ioutil.TempDir("", "go-vcs")
+func storePackage(p *pkg.Package) {
 
-	bytes, err := syft.Encode(*sbom, syft.FormatByName("spdx-2-json"))
+	graphAPI := graph.NewClient()
+
+	txn := graphAPI.NewTxn()
+
+	pb, err := json.Marshal(p)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
-	f, err := os.Create(local + "/spdx.json")
-
+	mu := &api.Mutation{
+		SetJson: pb,
+	}
+	res, err := txn.Mutate(ctx, mu)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
-
-	defer f.Close()
-
-	_, err2 := f.WriteString(string(bytes))
-
-	if err2 != nil {
-		fmt.Println(err2)
-	}
-
-	fmt.Println(local + "/spdx.json" + " done")
 }
 
 func syftProvider(userInput string, config ProviderConfig) (Context, *sbom.SBOM, error) {

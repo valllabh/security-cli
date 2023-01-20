@@ -14,6 +14,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect
+	github.com/dgraph-io/dgo/v210 v210.0.0-20220113041351-ba0e5dfc4c3e // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/go-restruct/restruct v1.2.0-alpha // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -62,6 +63,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.0.2 // indirect
 	github.com/containerd/containerd v1.6.12 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.12.0 // indirect
+	github.com/dgraph-io/dgo v1.0.0
 	github.com/docker/cli v20.10.17+incompatible // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker v20.10.17+incompatible // indirect
