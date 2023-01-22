@@ -1,0 +1,624 @@
+#######################
+# Input Schema
+#######################
+
+directive @goTag(
+	key: String!
+	value: String
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+type Package {
+	name: String! @search @goTag(key: "json", value: "Package.name")
+	versions(filter: PackageVersionFilter, order: PackageVersionOrder, first: Int, offset: Int): [PackageVersion]!
+	licenses(filter: LicenseFilter, order: LicenseOrder, first: Int, offset: Int): [License]
+	languages(filter: ProgrammingLanguageFilter, order: ProgrammingLanguageOrder, first: Int, offset: Int): [ProgrammingLanguage]
+	type(filter: PackageTypeFilter): PackageType!
+	url: String @search
+	versionsAggregate(filter: PackageVersionFilter): PackageVersionAggregateResult
+	licensesAggregate(filter: LicenseFilter): LicenseAggregateResult
+	languagesAggregate(filter: ProgrammingLanguageFilter): ProgrammingLanguageAggregateResult
+}
+
+type License {
+	id: String! @id
+}
+
+type PackageVersion {
+	id: String! @id
+}
+
+type ProgrammingLanguage {
+	id: String! @id
+}
+
+type PackageType {
+	id: String! @id
+}
+
+#######################
+# Extended Definitions
+#######################
+
+"""
+The Int64 scalar type represents a signed 64‐bit numeric non‐fractional value.
+Int64 can represent values in range [-(2^63),(2^63 - 1)].
+"""
+scalar Int64
+
+"""
+The DateTime scalar type represents date and time as a string in RFC3339 format.
+For example: "1985-04-12T23:20:50.52Z" represents 20 minutes and 50.52 seconds after the 23rd hour of April 12th, 1985 in UTC.
+"""
+scalar DateTime
+
+input IntRange{
+	min: Int!
+	max: Int!
+}
+
+input FloatRange{
+	min: Float!
+	max: Float!
+}
+
+input Int64Range{
+	min: Int64!
+	max: Int64!
+}
+
+input DateTimeRange{
+	min: DateTime!
+	max: DateTime!
+}
+
+input StringRange{
+	min: String!
+	max: String!
+}
+
+enum DgraphIndex {
+	int
+	int64
+	float
+	bool
+	hash
+	exact
+	term
+	fulltext
+	trigram
+	regexp
+	year
+	month
+	day
+	hour
+	geo
+}
+
+input AuthRule {
+	and: [AuthRule]
+	or: [AuthRule]
+	not: AuthRule
+	rule: String
+}
+
+enum HTTPMethod {
+	GET
+	POST
+	PUT
+	PATCH
+	DELETE
+}
+
+enum Mode {
+	BATCH
+	SINGLE
+}
+
+input CustomHTTP {
+	url: String!
+	method: HTTPMethod!
+	body: String
+	graphql: String
+	mode: Mode
+	forwardHeaders: [String!]
+	secretHeaders: [String!]
+	introspectionHeaders: [String!]
+	skipIntrospection: Boolean
+}
+
+type Point {
+	longitude: Float!
+	latitude: Float!
+}
+
+input PointRef {
+	longitude: Float!
+	latitude: Float!
+}
+
+input NearFilter {
+	distance: Float!
+	coordinate: PointRef!
+}
+
+input PointGeoFilter {
+	near: NearFilter
+	within: WithinFilter
+}
+
+type PointList {
+	points: [Point!]!
+}
+
+input PointListRef {
+	points: [PointRef!]!
+}
+
+type Polygon {
+	coordinates: [PointList!]!
+}
+
+input PolygonRef {
+	coordinates: [PointListRef!]!
+}
+
+type MultiPolygon {
+	polygons: [Polygon!]!
+}
+
+input MultiPolygonRef {
+	polygons: [PolygonRef!]!
+}
+
+input WithinFilter {
+	polygon: PolygonRef!
+}
+
+input ContainsFilter {
+	point: PointRef
+	polygon: PolygonRef
+}
+
+input IntersectsFilter {
+	polygon: PolygonRef
+	multiPolygon: MultiPolygonRef
+}
+
+input PolygonGeoFilter {
+	near: NearFilter
+	within: WithinFilter
+	contains: ContainsFilter
+	intersects: IntersectsFilter
+}
+
+input GenerateQueryParams {
+	get: Boolean
+	query: Boolean
+	password: Boolean
+	aggregate: Boolean
+}
+
+input GenerateMutationParams {
+	add: Boolean
+	update: Boolean
+	delete: Boolean
+}
+
+directive @hasInverse(field: String!) on FIELD_DEFINITION
+directive @search(by: [DgraphIndex!]) on FIELD_DEFINITION
+directive @dgraph(type: String, pred: String) on OBJECT | INTERFACE | FIELD_DEFINITION
+directive @id on FIELD_DEFINITION
+directive @withSubscription on OBJECT | INTERFACE | FIELD_DEFINITION
+directive @secret(field: String!, pred: String) on OBJECT | INTERFACE
+directive @auth(
+	password: AuthRule
+	query: AuthRule,
+	add: AuthRule,
+	update: AuthRule,
+	delete: AuthRule) on OBJECT | INTERFACE
+directive @custom(http: CustomHTTP, dql: String) on FIELD_DEFINITION
+directive @remote on OBJECT | INTERFACE | UNION | INPUT_OBJECT | ENUM
+directive @remoteResponse(name: String) on FIELD_DEFINITION
+directive @cascade(fields: [String]) on FIELD
+directive @lambda on FIELD_DEFINITION
+directive @lambdaOnMutate(add: Boolean, update: Boolean, delete: Boolean) on OBJECT | INTERFACE
+directive @cacheControl(maxAge: Int!) on QUERY
+directive @generate(
+	query: GenerateQueryParams,
+	mutation: GenerateMutationParams,
+	subscription: Boolean) on OBJECT | INTERFACE
+
+input IntFilter {
+	eq: Int
+	in: [Int]
+	le: Int
+	lt: Int
+	ge: Int
+	gt: Int
+	between: IntRange
+}
+
+input Int64Filter {
+	eq: Int64
+	in: [Int64]
+	le: Int64
+	lt: Int64
+	ge: Int64
+	gt: Int64
+	between: Int64Range
+}
+
+input FloatFilter {
+	eq: Float
+	in: [Float]
+	le: Float
+	lt: Float
+	ge: Float
+	gt: Float
+	between: FloatRange
+}
+
+input DateTimeFilter {
+	eq: DateTime
+	in: [DateTime]
+	le: DateTime
+	lt: DateTime
+	ge: DateTime
+	gt: DateTime
+	between: DateTimeRange
+}
+
+input StringTermFilter {
+	allofterms: String
+	anyofterms: String
+}
+
+input StringRegExpFilter {
+	regexp: String
+}
+
+input StringFullTextFilter {
+	alloftext: String
+	anyoftext: String
+}
+
+input StringExactFilter {
+	eq: String
+	in: [String]
+	le: String
+	lt: String
+	ge: String
+	gt: String
+	between: StringRange
+}
+
+input StringHashFilter {
+	eq: String
+	in: [String]
+}
+
+#######################
+# Generated Types
+#######################
+
+type AddLicensePayload {
+	license(filter: LicenseFilter, order: LicenseOrder, first: Int, offset: Int): [License]
+	numUids: Int
+}
+
+type AddPackagePayload {
+	package(filter: PackageFilter, order: PackageOrder, first: Int, offset: Int): [Package]
+	numUids: Int
+}
+
+type AddPackageTypePayload {
+	packageType(filter: PackageTypeFilter, order: PackageTypeOrder, first: Int, offset: Int): [PackageType]
+	numUids: Int
+}
+
+type AddPackageVersionPayload {
+	packageVersion(filter: PackageVersionFilter, order: PackageVersionOrder, first: Int, offset: Int): [PackageVersion]
+	numUids: Int
+}
+
+type AddProgrammingLanguagePayload {
+	programmingLanguage(filter: ProgrammingLanguageFilter, order: ProgrammingLanguageOrder, first: Int, offset: Int): [ProgrammingLanguage]
+	numUids: Int
+}
+
+type DeleteLicensePayload {
+	license(filter: LicenseFilter, order: LicenseOrder, first: Int, offset: Int): [License]
+	msg: String
+	numUids: Int
+}
+
+type DeletePackagePayload {
+	package(filter: PackageFilter, order: PackageOrder, first: Int, offset: Int): [Package]
+	msg: String
+	numUids: Int
+}
+
+type DeletePackageTypePayload {
+	packageType(filter: PackageTypeFilter, order: PackageTypeOrder, first: Int, offset: Int): [PackageType]
+	msg: String
+	numUids: Int
+}
+
+type DeletePackageVersionPayload {
+	packageVersion(filter: PackageVersionFilter, order: PackageVersionOrder, first: Int, offset: Int): [PackageVersion]
+	msg: String
+	numUids: Int
+}
+
+type DeleteProgrammingLanguagePayload {
+	programmingLanguage(filter: ProgrammingLanguageFilter, order: ProgrammingLanguageOrder, first: Int, offset: Int): [ProgrammingLanguage]
+	msg: String
+	numUids: Int
+}
+
+type LicenseAggregateResult {
+	count: Int
+	idMin: String
+	idMax: String
+}
+
+type PackageAggregateResult {
+	count: Int
+	nameMin: String
+	nameMax: String
+	urlMin: String
+	urlMax: String
+}
+
+type PackageTypeAggregateResult {
+	count: Int
+	idMin: String
+	idMax: String
+}
+
+type PackageVersionAggregateResult {
+	count: Int
+	idMin: String
+	idMax: String
+}
+
+type ProgrammingLanguageAggregateResult {
+	count: Int
+	idMin: String
+	idMax: String
+}
+
+type UpdatePackagePayload {
+	package(filter: PackageFilter, order: PackageOrder, first: Int, offset: Int): [Package]
+	numUids: Int
+}
+
+#######################
+# Generated Enums
+#######################
+
+enum LicenseHasFilter {
+	id
+}
+
+enum LicenseOrderable {
+	id
+}
+
+enum PackageHasFilter {
+	name
+	versions
+	licenses
+	languages
+	type
+	url
+}
+
+enum PackageOrderable {
+	name
+	url
+}
+
+enum PackageTypeHasFilter {
+	id
+}
+
+enum PackageTypeOrderable {
+	id
+}
+
+enum PackageVersionHasFilter {
+	id
+}
+
+enum PackageVersionOrderable {
+	id
+}
+
+enum ProgrammingLanguageHasFilter {
+	id
+}
+
+enum ProgrammingLanguageOrderable {
+	id
+}
+
+#######################
+# Generated Inputs
+#######################
+
+input AddLicenseInput {
+	id: String!
+}
+
+input AddPackageInput {
+	name: String!
+	versions: [PackageVersionRef]!
+	licenses: [LicenseRef]
+	languages: [ProgrammingLanguageRef]
+	type: PackageTypeRef!
+	url: String
+}
+
+input AddPackageTypeInput {
+	id: String!
+}
+
+input AddPackageVersionInput {
+	id: String!
+}
+
+input AddProgrammingLanguageInput {
+	id: String!
+}
+
+input LicenseFilter {
+	id: StringHashFilter
+	has: [LicenseHasFilter]
+	and: [LicenseFilter]
+	or: [LicenseFilter]
+	not: LicenseFilter
+}
+
+input LicenseOrder {
+	asc: LicenseOrderable
+	desc: LicenseOrderable
+	then: LicenseOrder
+}
+
+input LicenseRef {
+	id: String!
+}
+
+input PackageFilter {
+	name: StringTermFilter
+	url: StringTermFilter
+	has: [PackageHasFilter]
+	and: [PackageFilter]
+	or: [PackageFilter]
+	not: PackageFilter
+}
+
+input PackageOrder {
+	asc: PackageOrderable
+	desc: PackageOrderable
+	then: PackageOrder
+}
+
+input PackagePatch {
+	name: String
+	versions: [PackageVersionRef]
+	licenses: [LicenseRef]
+	languages: [ProgrammingLanguageRef]
+	type: PackageTypeRef
+	url: String
+}
+
+input PackageRef {
+	name: String
+	versions: [PackageVersionRef]
+	licenses: [LicenseRef]
+	languages: [ProgrammingLanguageRef]
+	type: PackageTypeRef
+	url: String
+}
+
+input PackageTypeFilter {
+	id: StringHashFilter
+	has: [PackageTypeHasFilter]
+	and: [PackageTypeFilter]
+	or: [PackageTypeFilter]
+	not: PackageTypeFilter
+}
+
+input PackageTypeOrder {
+	asc: PackageTypeOrderable
+	desc: PackageTypeOrderable
+	then: PackageTypeOrder
+}
+
+input PackageTypeRef {
+	id: String!
+}
+
+input PackageVersionFilter {
+	id: StringHashFilter
+	has: [PackageVersionHasFilter]
+	and: [PackageVersionFilter]
+	or: [PackageVersionFilter]
+	not: PackageVersionFilter
+}
+
+input PackageVersionOrder {
+	asc: PackageVersionOrderable
+	desc: PackageVersionOrderable
+	then: PackageVersionOrder
+}
+
+input PackageVersionRef {
+	id: String!
+}
+
+input ProgrammingLanguageFilter {
+	id: StringHashFilter
+	has: [ProgrammingLanguageHasFilter]
+	and: [ProgrammingLanguageFilter]
+	or: [ProgrammingLanguageFilter]
+	not: ProgrammingLanguageFilter
+}
+
+input ProgrammingLanguageOrder {
+	asc: ProgrammingLanguageOrderable
+	desc: ProgrammingLanguageOrderable
+	then: ProgrammingLanguageOrder
+}
+
+input ProgrammingLanguageRef {
+	id: String!
+}
+
+input UpdatePackageInput {
+	filter: PackageFilter!
+	set: PackagePatch
+	remove: PackagePatch
+}
+
+#######################
+# Generated Query
+#######################
+
+type Query {
+	queryPackage(filter: PackageFilter, order: PackageOrder, first: Int, offset: Int): [Package]
+	aggregatePackage(filter: PackageFilter): PackageAggregateResult
+	getLicense(id: String!): License
+	queryLicense(filter: LicenseFilter, order: LicenseOrder, first: Int, offset: Int): [License]
+	aggregateLicense(filter: LicenseFilter): LicenseAggregateResult
+	getPackageVersion(id: String!): PackageVersion
+	queryPackageVersion(filter: PackageVersionFilter, order: PackageVersionOrder, first: Int, offset: Int): [PackageVersion]
+	aggregatePackageVersion(filter: PackageVersionFilter): PackageVersionAggregateResult
+	getProgrammingLanguage(id: String!): ProgrammingLanguage
+	queryProgrammingLanguage(filter: ProgrammingLanguageFilter, order: ProgrammingLanguageOrder, first: Int, offset: Int): [ProgrammingLanguage]
+	aggregateProgrammingLanguage(filter: ProgrammingLanguageFilter): ProgrammingLanguageAggregateResult
+	getPackageType(id: String!): PackageType
+	queryPackageType(filter: PackageTypeFilter, order: PackageTypeOrder, first: Int, offset: Int): [PackageType]
+	aggregatePackageType(filter: PackageTypeFilter): PackageTypeAggregateResult
+}
+
+#######################
+# Generated Mutations
+#######################
+
+type Mutation {
+	addPackage(input: [AddPackageInput!]!): AddPackagePayload
+	updatePackage(input: UpdatePackageInput!): UpdatePackagePayload
+	deletePackage(filter: PackageFilter!): DeletePackagePayload
+	addLicense(input: [AddLicenseInput!]!, upsert: Boolean): AddLicensePayload
+	deleteLicense(filter: LicenseFilter!): DeleteLicensePayload
+	addPackageVersion(input: [AddPackageVersionInput!]!, upsert: Boolean): AddPackageVersionPayload
+	deletePackageVersion(filter: PackageVersionFilter!): DeletePackageVersionPayload
+	addProgrammingLanguage(input: [AddProgrammingLanguageInput!]!, upsert: Boolean): AddProgrammingLanguagePayload
+	deleteProgrammingLanguage(filter: ProgrammingLanguageFilter!): DeleteProgrammingLanguagePayload
+	addPackageType(input: [AddPackageTypeInput!]!, upsert: Boolean): AddPackageTypePayload
+	deletePackageType(filter: PackageTypeFilter!): DeletePackageTypePayload
+}
+

@@ -1,4 +1,4 @@
-# security-cli
+go# security-cli
 
 ## build commands
 

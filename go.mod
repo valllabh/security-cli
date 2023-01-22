@@ -3,8 +3,10 @@ module github.com/valllabh/security-cli
 go 1.19
 
 require (
+	github.com/99designs/gqlgen v0.17.22
 	github.com/anchore/syft v0.66.1
 	github.com/spf13/cobra v1.6.1
+	github.com/vektah/gqlparser/v2 v2.5.1
 )
 
 require (
@@ -13,8 +15,8 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
+	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect
-	github.com/dgraph-io/dgo/v210 v210.0.0-20220113041351-ba0e5dfc4c3e // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/go-restruct/restruct v1.2.0-alpha // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -63,7 +65,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.0.2 // indirect
 	github.com/containerd/containerd v1.6.12 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.12.0 // indirect
-	github.com/dgraph-io/dgo v1.0.0
+	github.com/dgraph-io/dgo/v2 v2.2.0
 	github.com/docker/cli v20.10.17+incompatible // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker v20.10.17+incompatible // indirect
@@ -111,8 +113,8 @@ require (
 	golang.org/x/net v0.0.0-20221012135044-0b7e1fb9d458 // indirect
 	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0 // indirect
 	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec // indirect
-	golang.org/x/text v0.3.8-0.20211004125949-5bd84dd9b33b // indirect
+	golang.org/x/text v0.3.8 // indirect
 	google.golang.org/genproto v0.0.0-20221010155953-15ba04fc1c0e // indirect
-	google.golang.org/grpc v1.50.1 // indirect
+	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1 // indirect
 )

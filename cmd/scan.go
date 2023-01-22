@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/valllabh/security-cli/lib/cataloger"
-	"github.com/valllabh/security-cli/lib/graph"
+	"github.com/valllabh/security-cli/lib/graphs"
 	"github.com/valllabh/security-cli/lib/ui"
 
 	"github.com/spf13/cobra"
@@ -34,16 +34,18 @@ func Scan(userInput string) {
 
 	packages := bom.Artifacts.PackageCatalog.Sorted()
 
-	for _, p := range packages {
-
-		ui.Step("Found " + p.Name + ":" + p.Version)
-		res, err := graph.Store(p)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		fmt.Println(res)
+	res, err := graphs.StorePackages(packages)
+	if err != nil {
+		fmt.Println(err)
 	}
+
+	fmt.Println(res.Metrics)
+
+	// for _, p := range packages {
+
+	// 	ui.Step("Found " + p.Name + ":" + p.Version)
+
+	// }
 
 }
 
