@@ -3,7 +3,7 @@ module github.com/valllabh/security-cli
 go 1.19
 
 require (
-	github.com/99designs/gqlgen v0.17.22
+	github.com/99designs/gqlgen v0.17.24
 	github.com/anchore/syft v0.68.0
 	github.com/spf13/cobra v1.6.1
 	github.com/vektah/gqlparser/v2 v2.5.1
