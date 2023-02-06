@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/99designs/gqlgen v0.17.24
-	github.com/anchore/syft v0.68.1
+	github.com/anchore/syft v0.70.0
 	github.com/spf13/cobra v1.6.1
 	github.com/vektah/gqlparser/v2 v2.5.1
 )
@@ -17,6 +17,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect
+	github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/go-restruct/restruct v1.2.0-alpha // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
@@ -33,7 +34,7 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/sassoftware/go-rpmutils v0.2.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
-	github.com/spdx/tools-golang v0.4.0 // indirect
+	github.com/spdx/tools-golang v0.5.0-rc1 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/vbatts/go-mtree v0.5.2 // indirect
 	github.com/vifraa/gopom v0.2.1 // indirect
@@ -68,7 +69,7 @@ require (
 	github.com/dgraph-io/dgo/v2 v2.2.0
 	github.com/docker/cli v20.10.20+incompatible // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
-	github.com/docker/docker v20.10.23+incompatible // indirect
+	github.com/docker/docker v23.0.0+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.7.0 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
