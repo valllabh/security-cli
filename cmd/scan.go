@@ -41,12 +41,6 @@ func Scan(userInput string) {
 
 	fmt.Println(res.Metrics)
 
-	// for _, p := range packages {
-
-	// 	ui.Step("Found " + p.Name + ":" + p.Version)
-
-	// }
-
 }
 
 func init() {

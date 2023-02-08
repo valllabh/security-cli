@@ -18,31 +18,41 @@ import (
 	"github.com/dgraph-io/dgo/v2/protos/api"
 )
 
+type Node interface {
+	getType() string
+	setUid(string)
+	getUid() string
+}
+
 type PackageVersion struct {
-	Uid   string   `json:"uid,omitempty"`
+	Node
 	ID    string   `json:"PackageVersion.id,omitempty"`
 	DType []string `json:"dgraph.type,omitempty"`
 }
 
 type License struct {
+	Node
 	Uid   string   `json:"uid,omitempty"`
 	ID    string   `json:"License.id,omitempty"`
 	DType []string `json:"dgraph.type,omitempty"`
 }
 
 type ProgrammingLanguage struct {
+	Node
 	Uid   string   `json:"uid,omitempty"`
 	ID    string   `json:"ProgrammingLanguage.id,omitempty"`
 	DType []string `json:"dgraph.type,omitempty"`
 }
 
 type PackageType struct {
+	Node
 	Uid   string   `json:"uid,omitempty"`
 	ID    string   `json:"PackageType.id,omitempty"`
 	DType []string `json:"dgraph.type,omitempty"`
 }
 
 type Package struct {
+	Node
 	Uid       string                 `json:"uid,omitempty"`
 	Name      string                 `json:"Package.name,omitempty"`
 	Versions  []*PackageVersion      `json:"Package.versions,omitempty"`
@@ -107,56 +117,6 @@ func NewClient() *dgo.Dgraph {
 	return dgo.NewDgraphClient(api.NewDgraphClient(conn))
 }
 
-func StoreLicense(l License) (string, error) {
-
-	ctx := context.Background()
-
-	query := `
-		query {
-			o as var(func: eq(License.id, "` + l.ID + `"))
-		}
-	`
-
-	l.Uid = "uid(o)"
-
-	graphAPI := NewClient()
-
-	txn := graphAPI.NewTxn()
-
-	ui.Step("DB: New Transaction for License")
-
-	pb, err := json.Marshal(l)
-
-	if err != nil {
-		ui.Fatal(err)
-		return "", err
-	}
-
-	mu := &api.Mutation{
-		SetJson: pb,
-	}
-
-	req := &api.Request{
-		Query:     query,
-		Mutations: []*api.Mutation{mu},
-		CommitNow: true,
-	}
-
-	ui.Step("DB: Mutating for License")
-	ui.Step(query)
-
-	_, err = txn.Do(ctx, req)
-
-	if err != nil {
-		ui.Fatal(err)
-		return "", err
-	}
-
-	ui.Step("DB: Mutation Done for License")
-
-	return "", nil
-}
-
 func getQueryVarBlock(varName string, k string, v string) string {
 	return varName + ` as var(func: eq(` + k + `, "` + v + `"))`
 }
@@ -164,6 +124,13 @@ func getQueryVarBlock(varName string, k string, v string) string {
 func getVarName(text string) string {
 	hash := md5.Sum([]byte(text))
 	return "A" + hex.EncodeToString(hash[:])
+}
+
+func getUid(queryVars map[string]string, node Node) string {
+
+	packageVarName := getVarName(node.getType() + value)
+	queryVars[packageVarName] = getQueryVarBlock(packageVarName, "Package.name", value)
+	return `uid(` + packageVarName + `)`
 }
 
 func StorePackages(ps []pkg.Package) (*api.Response, error) {
@@ -189,9 +156,11 @@ func StorePackages(ps []pkg.Package) (*api.Response, error) {
 			URL:   &p.PURL,
 			DType: []string{"Package"},
 		}
-		packageVarName := getVarName("Package" + packageObj.Name)
-		queryVars[packageVarName] = getQueryVarBlock(packageVarName, "Package.name", packageObj.Name)
-		packageObj.Uid = `uid(` + packageVarName + `)`
+
+		packageObj.Uid = getUid(queryVars, "Package", "Package.name", packageObj.Name)
+		// packageVarName := getVarName("Package" + packageObj.Name)
+		// queryVars[packageVarName] = getQueryVarBlock(packageVarName, "Package.name", packageObj.Name)
+		// packageObj.Uid = `uid(` + packageVarName + `)`
 
 		packageTypeVarName := getVarName("PackageType" + packageObj.Type.ID)
 		queryVars[packageTypeVarName] = getQueryVarBlock(packageTypeVarName, "PackageType.id", packageObj.Type.ID)
