@@ -9,30 +9,30 @@ directive @goTag(
 
 type Package {
 	name: String! @search @goTag(key: "json", value: "Package.name")
-	versions(filter: PackageVersionFilter, order: PackageVersionOrder, first: Int, offset: Int): [PackageVersion]!
-	licenses(filter: LicenseFilter, order: LicenseOrder, first: Int, offset: Int): [License]
-	languages(filter: ProgrammingLanguageFilter, order: ProgrammingLanguageOrder, first: Int, offset: Int): [ProgrammingLanguage]
-	type(filter: PackageTypeFilter): PackageType!
-	url: String @search
+	versions(filter: PackageVersionFilter, order: PackageVersionOrder, first: Int, offset: Int): [PackageVersion]!  @goTag(key: "json", value: "Package.versions")
+	licenses(filter: LicenseFilter, order: LicenseOrder, first: Int, offset: Int): [License] @goTag(key: "json", value: "Package.licenses")
+	languages(filter: ProgrammingLanguageFilter, order: ProgrammingLanguageOrder, first: Int, offset: Int): [ProgrammingLanguage] @goTag(key: "json", value: "Package.languages")
+	type(filter: PackageTypeFilter): PackageType! @goTag(key: "json", value: "Package.type")
+	url: String @search @goTag(key: "json", value: "Package.url")
 	versionsAggregate(filter: PackageVersionFilter): PackageVersionAggregateResult
 	licensesAggregate(filter: LicenseFilter): LicenseAggregateResult
 	languagesAggregate(filter: ProgrammingLanguageFilter): ProgrammingLanguageAggregateResult
 }
 
 type License {
-	id: String! @id
+	id: String! @id @goTag(key: "json", value: "License.id")
 }
 
 type PackageVersion {
-	id: String! @id
+	id: String! @id @goTag(key: "json", value: "PackageVersion.id")
 }
 
 type ProgrammingLanguage {
-	id: String! @id
+	id: String! @id @goTag(key: "json", value: "ProgrammingLanguage.id")
 }
 
 type PackageType {
-	id: String! @id
+	id: String! @id @goTag(key: "json", value: "PackageType.id")
 }
 
 #######################
@@ -448,28 +448,28 @@ enum ProgrammingLanguageOrderable {
 #######################
 
 input AddLicenseInput {
-	id: String!
+	id: String! @goTag(key: "json", value: "License.id")
 }
 
 input AddPackageInput {
-	name: String!
-	versions: [PackageVersionRef]!
-	licenses: [LicenseRef]
-	languages: [ProgrammingLanguageRef]
-	type: PackageTypeRef!
-	url: String
+	name: String! @goTag(key: "json", value: "Package.name")
+	versions: [PackageVersionRef]! @goTag(key: "json", value: "Package.versions")
+	licenses: [LicenseRef] @goTag(key: "json", value: "Package.licenses")
+	languages: [ProgrammingLanguageRef] @goTag(key: "json", value: "Package.languages")
+	type: PackageTypeRef! @goTag(key: "json", value: "Package.type")
+	url: String @goTag(key: "json", value: "Package.url")
 }
 
 input AddPackageTypeInput {
-	id: String!
+	id: String!  @goTag(key: "json", value: "PackageType.id")
 }
 
 input AddPackageVersionInput {
-	id: String!
+	id: String!  @goTag(key: "json", value: "PackageVersion.id")
 }
 
 input AddProgrammingLanguageInput {
-	id: String!
+	id: String!  @goTag(key: "json", value: "ProgrammingLanguage.id")
 }
 
 input LicenseFilter {
@@ -487,7 +487,7 @@ input LicenseOrder {
 }
 
 input LicenseRef {
-	id: String!
+	id: String! @goTag(key: "json", value: "License.id")
 }
 
 input PackageFilter {
@@ -506,21 +506,21 @@ input PackageOrder {
 }
 
 input PackagePatch {
-	name: String
-	versions: [PackageVersionRef]
-	licenses: [LicenseRef]
-	languages: [ProgrammingLanguageRef]
-	type: PackageTypeRef
-	url: String
+	name: String @goTag(key: "json", value: "Package.name")
+	versions: [PackageVersionRef] @goTag(key: "json", value: "Package.versions")
+	licenses: [LicenseRef] @goTag(key: "json", value: "Package.licenses")
+	languages: [ProgrammingLanguageRef] @goTag(key: "json", value: "Package.languages")
+	type: PackageTypeRef @goTag(key: "json", value: "Package.type")
+	url: String @goTag(key: "json", value: "Package.url")
 }
 
 input PackageRef {
-	name: String
-	versions: [PackageVersionRef]
-	licenses: [LicenseRef]
-	languages: [ProgrammingLanguageRef]
-	type: PackageTypeRef
-	url: String
+	name: String @goTag(key: "json", value: "Package.name")
+	versions: [PackageVersionRef] @goTag(key: "json", value: "Package.versions")
+	licenses: [LicenseRef] @goTag(key: "json", value: "Package.licenses")
+	languages: [ProgrammingLanguageRef] @goTag(key: "json", value: "Package.languages")
+	type: PackageTypeRef @goTag(key: "json", value: "Package.type")
+	url: String @goTag(key: "json", value: "Package.url")
 }
 
 input PackageTypeFilter {
@@ -538,7 +538,7 @@ input PackageTypeOrder {
 }
 
 input PackageTypeRef {
-	id: String!
+	id: String! @goTag(key: "json", value: "PackageType.id")
 }
 
 input PackageVersionFilter {
@@ -556,7 +556,7 @@ input PackageVersionOrder {
 }
 
 input PackageVersionRef {
-	id: String!
+	id: String! @goTag(key: "json", value: "PackageVersion.id")
 }
 
 input ProgrammingLanguageFilter {
@@ -574,7 +574,7 @@ input ProgrammingLanguageOrder {
 }
 
 input ProgrammingLanguageRef {
-	id: String!
+	id: String! @goTag(key: "json", value: "ProgrammingLanguage.id")
 }
 
 input UpdatePackageInput {

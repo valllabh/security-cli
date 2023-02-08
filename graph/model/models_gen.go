@@ -232,7 +232,7 @@ type NearFilter struct {
 }
 
 type Package struct {
-	Name               string                              `json:"name" json:"Package.name"`
+	Name               string                              `json:"name"`
 	Versions           []*PackageVersion                   `json:"versions"`
 	Licenses           []*License                          `json:"licenses"`
 	Languages          []*ProgrammingLanguage              `json:"languages"`
