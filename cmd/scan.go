@@ -4,11 +4,9 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/valllabh/security-cli/lib/cataloger"
-	"github.com/valllabh/security-cli/lib/graphs"
 	"github.com/valllabh/security-cli/lib/ui"
+	"github.com/valllabh/security-cli/lib/util"
 
 	"github.com/spf13/cobra"
 )
@@ -32,14 +30,16 @@ func Scan(userInput string) {
 		return
 	}
 
-	packages := bom.Artifacts.PackageCatalog.Sorted()
+	util.ConvertToSPDXJson(bom)
 
-	res, err := graphs.StorePackages(packages)
-	if err != nil {
-		fmt.Println(err)
-	}
+	// packages := bom.Artifacts.PackageCatalog.Sorted()
 
-	fmt.Println(res.Metrics)
+	// res, err := graphs.StorePackages(packages)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+
+	// fmt.Println(res.Metrics)
 
 }
 

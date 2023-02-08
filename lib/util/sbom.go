@@ -1,4 +1,4 @@
-package sbomUtil
+package util
 
 import (
 	"fmt"

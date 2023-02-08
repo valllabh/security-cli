@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/json"
+	"reflect"
 	"strings"
 
 	"github.com/anchore/syft/syft/pkg"
@@ -18,21 +19,20 @@ import (
 	"github.com/dgraph-io/dgo/v2/protos/api"
 )
 
-type Node interface {
-	getType() string
-	setUid(string)
-	getUid() string
+type Node struct {
+	Uid   string   `json:"uid,omitempty"`
+	DType []string `json:"dgraph.type,omitempty"`
 }
 
 type PackageVersion struct {
 	Node
+	Uid   string   `json:"uid,omitempty"`
 	ID    string   `json:"PackageVersion.id,omitempty"`
 	DType []string `json:"dgraph.type,omitempty"`
 }
 
 type License struct {
 	Node
-	Uid   string   `json:"uid,omitempty"`
 	ID    string   `json:"License.id,omitempty"`
 	DType []string `json:"dgraph.type,omitempty"`
 }
@@ -126,11 +126,14 @@ func getVarName(text string) string {
 	return "A" + hex.EncodeToString(hash[:])
 }
 
-func getUid(queryVars map[string]string, node Node) string {
+func upsertWith(queryVars map[string]string, node any, field string, value string) {
+	reflectValue := reflect.ValueOf(node).Elem()
+	f := reflectValue.FieldByName("DType")
+	t := f.Index(0).String()
+	packageVarName := getVarName(t + value)
+	queryVars[packageVarName] = getQueryVarBlock(packageVarName, field, value)
 
-	packageVarName := getVarName(node.getType() + value)
-	queryVars[packageVarName] = getQueryVarBlock(packageVarName, "Package.name", value)
-	return `uid(` + packageVarName + `)`
+	reflectValue.FieldByName("Uid").SetString(`uid(` + packageVarName + `)`)
 }
 
 func StorePackages(ps []pkg.Package) (*api.Response, error) {
@@ -151,28 +154,22 @@ func StorePackages(ps []pkg.Package) (*api.Response, error) {
 			Licenses:  []*License{},
 			Languages: []*ProgrammingLanguage{},
 			Type: &PackageType{
-				ID: string(p.Type),
+				ID:    string(p.Type),
+				DType: []string{"PackageType"},
 			},
 			URL:   &p.PURL,
 			DType: []string{"Package"},
 		}
 
-		packageObj.Uid = getUid(queryVars, "Package", "Package.name", packageObj.Name)
-		// packageVarName := getVarName("Package" + packageObj.Name)
-		// queryVars[packageVarName] = getQueryVarBlock(packageVarName, "Package.name", packageObj.Name)
-		// packageObj.Uid = `uid(` + packageVarName + `)`
+		upsertWith(queryVars, &packageObj, "Package.name", packageObj.Name)
 
-		packageTypeVarName := getVarName("PackageType" + packageObj.Type.ID)
-		queryVars[packageTypeVarName] = getQueryVarBlock(packageTypeVarName, "PackageType.id", packageObj.Type.ID)
-		packageObj.Type.Uid = `uid(` + packageTypeVarName + `)`
+		upsertWith(queryVars, (packageObj.Type), "PackageType.id", packageObj.Type.ID)
 
 		versionObj := PackageVersion{
 			ID:    p.Name + "-" + p.Version,
 			DType: []string{"PackageVersion"},
 		}
-		versionVarName := getVarName("PackageVersion" + versionObj.ID)
-		queryVars[versionVarName] = getQueryVarBlock(versionVarName, "PackageVersion.id", versionObj.ID)
-		versionObj.Uid = `uid(` + versionVarName + `)`
+		upsertWith(queryVars, &versionObj, "PackageVersion.id", versionObj.ID)
 
 		packageObj.Versions = append(packageObj.Versions, &versionObj)
 
@@ -182,9 +179,7 @@ func StorePackages(ps []pkg.Package) (*api.Response, error) {
 				ID:    l,
 				DType: []string{"License"},
 			}
-			licenseVarName := getVarName("License" + licenseObj.ID)
-			queryVars[licenseVarName] = getQueryVarBlock(licenseVarName, "License.id", l)
-			licenseObj.Uid = `uid(` + licenseVarName + `)`
+			upsertWith(queryVars, &licenseObj, "License.id", licenseObj.ID)
 
 			packageObj.Licenses = append(packageObj.Licenses, &licenseObj)
 		}
@@ -194,10 +189,7 @@ func StorePackages(ps []pkg.Package) (*api.Response, error) {
 				ID:    string(p.Language),
 				DType: []string{"ProgrammingLanguage"},
 			}
-
-			programmingLanguageVarName := getVarName("ProgrammingLanguage" + programmingLanguageObj.ID)
-			queryVars[programmingLanguageVarName] = getQueryVarBlock(programmingLanguageVarName, "ProgrammingLanguage.ID", programmingLanguageObj.ID)
-			programmingLanguageObj.Uid = `uid(` + programmingLanguageVarName + `)`
+			upsertWith(queryVars, &programmingLanguageObj, "ProgrammingLanguage.ID", programmingLanguageObj.ID)
 
 			packageObj.Languages = append(packageObj.Languages, &programmingLanguageObj)
 		}
