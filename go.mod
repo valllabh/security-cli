@@ -39,6 +39,7 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/vbatts/go-mtree v0.5.2 // indirect
 	github.com/vifraa/gopom v0.2.1 // indirect
+	go.uber.org/goleak v1.1.12 // indirect
 	golang.org/x/exp v0.0.0-20230202163644-54bba9f4231b // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/tools v0.2.0 // indirect
@@ -65,7 +66,7 @@ require (
 	github.com/anchore/stereoscope v0.0.0-20230208154630-5a306f07f2e7
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.6.0 // indirect
-	github.com/containerd/containerd v1.6.12 // indirect
+	github.com/containerd/containerd v1.6.18 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.12.1 // indirect
 	github.com/dgraph-io/dgo/v2 v2.2.0
 	github.com/docker/cli v20.10.20+incompatible // indirect
